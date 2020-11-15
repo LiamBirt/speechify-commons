@@ -9,10 +9,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "stripInternal": true,
-    "outDir": "dist",
+    "outDir": ".",
     "lib": [ "es2015", "dom"]
   },
   "files": [
-    "src/models/index.ts"
+    "src/models/index.ts",
+    "src/helpers/index.ts"
   ],
 }

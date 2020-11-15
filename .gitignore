@@ -5,3 +5,5 @@ package-lock.json
 .fusebox
 coverage
 .DS_Store
+helpers
+models
