@@ -1,5 +1,5 @@
 {
-  "name": "speechify-commons",
+  "name": "@speechify/commons",
   "version": "0.0.1",
   "description": "Models, Services and Helpers for common use",
   "main": "dist/index.js",
