@@ -5,5 +5,6 @@ export const FirestoreCollection = {
   articleURL: 'articleURL',
   subscriptionInfo: 'subscriptionInfo',
   subscriptionCodes: 'subscriptionCodes',
+  subscriptionPlans: 'subscriptionPlans',
   promoCodes: 'promoCodes',
 };
