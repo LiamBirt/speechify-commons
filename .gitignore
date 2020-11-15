@@ -4,3 +4,4 @@ yarn.lock
 package-lock.json
 .fusebox
 coverage
+.DS_Store
