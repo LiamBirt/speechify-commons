@@ -2,8 +2,6 @@
   "name": "@speechify/commons",
   "version": "0.0.1",
   "description": "Models, Services and Helpers for common use",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
   "repository": "https://github.com/SpeechifyInc/speechify-commons.git",
   "author": "Speechify",
   "license": "Private",
