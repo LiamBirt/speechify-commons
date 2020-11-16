@@ -5,5 +5,3 @@ package-lock.json
 .fusebox
 coverage
 .DS_Store
-*.js
-*.d.ts

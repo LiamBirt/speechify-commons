@@ -6,7 +6,7 @@
   "author": "Speechify",
   "license": "Private",
   "scripts": {
-    "prepare": "npm run build",
+    "prepare": "echo 'Preparing Commons' && npm run build",
     "clean": "lerna clean",
     "updated": "lerna updated",
     "bootstrap": "lerna bootstrap",
