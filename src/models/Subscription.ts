@@ -159,7 +159,7 @@ export class Subscription implements ISubscription {
     this.currentBatchExpiresAt = 0;
     this.environment = environment;
     source = source || SubscriptionSource.apple;
-    this.updatedAt = new Date().valueOf();
+    this.updatedAt = moment().unix();
     this.status = SubscriptionStatus.cancelled;
   }
 
@@ -271,7 +271,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
   }
 
   private onUpdate(): void {
-    this.updatedAt = new Date().valueOf();
+    this.updatedAt = moment().unix();
   }
 
   private getSubscriptionValue(): ISubscriptionPlan {
@@ -300,7 +300,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
     this.nextApplicationAt = -1;
     this.limitsCountLeft = 0;
     this.latestApplicationAt = this.updatedAt;
-    this.expiresAt = Math.min(this.getGraceMin(), new Date().valueOf());
+    this.expiresAt = Math.min(this.getGraceMin(), moment().unix());
   }
 
   getGracePeriod(): number {
@@ -316,9 +316,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
   }
 
   isValid(): boolean {
-    return (
-      this.is_refunded !== true && new Date().valueOf() < this.getGraceMax()
-    );
+    return this.is_refunded !== true && moment().unix() < this.getGraceMax();
   }
 
   isPremium(): boolean {
@@ -471,7 +469,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
     this.is_refunded = transaction.cancellation_date ? true : false;
     this.limitsCountLeft = subscriptionPlan.renewLimit;
     this.nextCheckAt = this.getGraceMin();
-    this.nextApplicationAt = new Date().valueOf();
+    this.nextApplicationAt = moment().unix();
 
     if (subscriptionPlan) {
       this.subscriptionPlan = subscriptionPlan;
@@ -511,7 +509,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
     this.is_refunded = false;
     this.limitsCountLeft = subscriptionPlan.renewLimit;
     this.nextCheckAt = -1;
-    this.nextApplicationAt = new Date().valueOf();
+    this.nextApplicationAt = moment().unix();
     this.stripeCustomerId = stripeCustomerId;
     this.stripeSubscriptionId = stripeSubscriptionId;
     this.subscriptionPlan = subscriptionPlan;
@@ -542,7 +540,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
         expiresAt: this.expiresAt,
         currentBatchExpiresAt,
         // the latest update is now
-        updatedAt: new Date().valueOf(),
+        updatedAt: moment().unix(),
         // specify resource that is equal to brand new subscription's resource
         resource: { decrementedAt: 0, wordsLeft: subscriptionValue.wordsLimit },
         productId: subscriptionValue.name,
@@ -558,7 +556,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
 
   // next check is scheduled 1 day since the previous check if nothing has changed
   scheduleNextCheck(): number {
-    const now = new Date().valueOf();
+    const now = moment().unix();
 
     // next check has not happened yet, so nothing changes
     if (now < this.nextCheckAt) {
