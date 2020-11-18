@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SubscriptionInfo = exports.Subscription = exports.SubscriptionStatus = exports.SubscriptionSource = exports.PaymentEnvironment = exports.GRACE_TIME_SANDBOX = exports.GRACE_TIME_PRODUCTION = void 0;
 const moment_1 = __importDefault(require("moment"));
 exports.GRACE_TIME_PRODUCTION = 3 * 24 * 60 * 60; // 3 days, seconds
 exports.GRACE_TIME_SANDBOX = 2 * 60; // 2 minutes, seconds
@@ -27,7 +28,7 @@ class Subscription {
     constructor({ userId, environment = PaymentEnvironment.Production, source = SubscriptionSource.apple, rawData, }) {
         this.userId = userId;
         if (rawData) {
-            return Object.assign({}, rawData, { userId });
+            return Object.assign(Object.assign({}, rawData), { userId });
         }
         this.resource = {
             wordsLeft: 0,
@@ -38,7 +39,7 @@ class Subscription {
         this.currentBatchExpiresAt = 0;
         this.environment = environment;
         source = source || SubscriptionSource.apple;
-        this.updatedAt = new Date().valueOf();
+        this.updatedAt = moment_1.default().unix();
         this.status = SubscriptionStatus.cancelled;
     }
     serialize() {
@@ -68,6 +69,22 @@ class Subscription {
 }
 exports.Subscription = Subscription;
 class SubscriptionInfo {
+    constructor(info, id) {
+        this.id = id;
+        this.productId = info.productId;
+        this.userId = info.userId;
+        this.latestTransactionId = info.latestTransactionId;
+        this.is_trial_period = info.is_trial_period;
+        this.is_refunded = info.is_refunded;
+        this.expiresAt = info.expiresAt;
+        this.updatedAt = info.updatedAt;
+        this.limitsCountLeft = info.limitsCountLeft;
+        this.latestApplicationAt = info.latestApplicationAt;
+        this.nextCheckAt = info.nextCheckAt;
+        this.nextApplicationAt = info.nextApplicationAt;
+        this.environment = info.environment;
+        this.source = info.source || SubscriptionSource.apple;
+    }
     static create(userId, id, is_trial_period, source) {
         const subscriptionInfo = new SubscriptionInfo({
             userId,
@@ -90,27 +107,11 @@ class SubscriptionInfo {
     static deserialize(info, id) {
         return new SubscriptionInfo(info, id);
     }
-    constructor(info, id) {
-        this.id = id;
-        this.productId = info.productId;
-        this.userId = info.userId;
-        this.latestTransactionId = info.latestTransactionId;
-        this.is_trial_period = info.is_trial_period;
-        this.is_refunded = info.is_refunded;
-        this.expiresAt = info.expiresAt;
-        this.updatedAt = info.updatedAt;
-        this.limitsCountLeft = info.limitsCountLeft;
-        this.latestApplicationAt = info.latestApplicationAt;
-        this.nextCheckAt = info.nextCheckAt;
-        this.nextApplicationAt = info.nextApplicationAt;
-        this.environment = info.environment;
-        this.source = info.source || SubscriptionSource.apple;
-    }
     isProd() {
         return this.environment === PaymentEnvironment.Production;
     }
     onUpdate() {
-        this.updatedAt = new Date().valueOf();
+        this.updatedAt = moment_1.default().unix();
     }
     getSubscriptionValue() {
         // stop processing the request if backend cannot handle this subscription type
@@ -134,7 +135,7 @@ class SubscriptionInfo {
         this.nextApplicationAt = -1;
         this.limitsCountLeft = 0;
         this.latestApplicationAt = this.updatedAt;
-        this.expiresAt = Math.min(this.getGraceMin(), new Date().valueOf());
+        this.expiresAt = Math.min(this.getGraceMin(), moment_1.default().unix());
     }
     getGracePeriod() {
         return this.isProd() ? exports.GRACE_TIME_PRODUCTION : exports.GRACE_TIME_SANDBOX;
@@ -146,7 +147,7 @@ class SubscriptionInfo {
         return this.expiresAt + this.getGracePeriod();
     }
     isValid() {
-        return (this.is_refunded !== true && new Date().valueOf() < this.getGraceMax());
+        return this.is_refunded !== true && moment_1.default().unix() < this.getGraceMax();
     }
     isPremium() {
         return (this.productId.includes('premium') || this.productId === 'stripe.annual');
@@ -253,7 +254,7 @@ class SubscriptionInfo {
         this.is_refunded = transaction.cancellation_date ? true : false;
         this.limitsCountLeft = subscriptionPlan.renewLimit;
         this.nextCheckAt = this.getGraceMin();
-        this.nextApplicationAt = new Date().valueOf();
+        this.nextApplicationAt = moment_1.default().unix();
         if (subscriptionPlan) {
             this.subscriptionPlan = subscriptionPlan;
         }
@@ -283,7 +284,7 @@ class SubscriptionInfo {
         this.is_refunded = false;
         this.limitsCountLeft = subscriptionPlan.renewLimit;
         this.nextCheckAt = -1;
-        this.nextApplicationAt = new Date().valueOf();
+        this.nextApplicationAt = moment_1.default().unix();
         this.stripeCustomerId = stripeCustomerId;
         this.stripeSubscriptionId = stripeSubscriptionId;
         this.subscriptionPlan = subscriptionPlan;
@@ -309,7 +310,7 @@ class SubscriptionInfo {
                 expiresAt: this.expiresAt,
                 currentBatchExpiresAt,
                 // the latest update is now
-                updatedAt: new Date().valueOf(),
+                updatedAt: moment_1.default().unix(),
                 // specify resource that is equal to brand new subscription's resource
                 resource: { decrementedAt: 0, wordsLeft: subscriptionValue.wordsLimit },
                 productId: subscriptionValue.name,
@@ -323,7 +324,7 @@ class SubscriptionInfo {
     }
     // next check is scheduled 1 day since the previous check if nothing has changed
     scheduleNextCheck() {
-        const now = new Date().valueOf();
+        const now = moment_1.default().unix();
         // next check has not happened yet, so nothing changes
         if (now < this.nextCheckAt) {
             return this.nextCheckAt;
