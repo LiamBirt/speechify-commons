@@ -3,7 +3,7 @@ export declare const FirestoreCollection: {
     md5Hashes: string;
     voices: string;
     articleURL: string;
-    subscriptionInfo: string;
+    subscriptionsInfo: string;
     subscriptionCodes: string;
     subscriptionPlans: string;
     promoCodes: string;
