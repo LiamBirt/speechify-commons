@@ -150,7 +150,9 @@ class SubscriptionInfo {
         return this.is_refunded !== true && moment_1.default().unix() < this.getGraceMax();
     }
     isPremium() {
-        return (this.productId.includes('premium') || this.productId === 'stripe.annual');
+        return (this.productId.includes('premium') ||
+            this.productId === 'stripe.annual' ||
+            this.productId === 'stripe.annual.discount');
     }
     isUnlimited() {
         return this.productId.includes('unlimited');

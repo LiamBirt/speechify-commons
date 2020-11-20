@@ -321,7 +321,9 @@ export class SubscriptionInfo implements ISubscriptionInfo {
 
   isPremium(): boolean {
     return (
-      this.productId.includes('premium') || this.productId === 'stripe.annual'
+      this.productId.includes('premium') ||
+      this.productId === 'stripe.annual' ||
+      this.productId === 'stripe.annual.discount'
     );
   }
 
