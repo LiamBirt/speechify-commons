@@ -13,6 +13,11 @@ export enum SubscriptionSource {
   apple = 'apple',
 }
 
+export enum PlanRenewalFrequency {
+  Monthly = 'monthly',
+  Annually = 'annually',
+}
+
 export enum SubscriptionStatus {
   trial = 'trial',
   paying = 'paying',

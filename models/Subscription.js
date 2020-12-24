@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SubscriptionInfo = exports.Subscription = exports.SubscriptionStatus = exports.SubscriptionSource = exports.PaymentEnvironment = exports.GRACE_TIME_SANDBOX = exports.GRACE_TIME_PRODUCTION = void 0;
+exports.SubscriptionInfo = exports.Subscription = exports.SubscriptionStatus = exports.PlanRenewalFrequency = exports.SubscriptionSource = exports.PaymentEnvironment = exports.GRACE_TIME_SANDBOX = exports.GRACE_TIME_PRODUCTION = void 0;
 const moment_1 = __importDefault(require("moment"));
 exports.GRACE_TIME_PRODUCTION = 3 * 24 * 60 * 60; // 3 days, seconds
 exports.GRACE_TIME_SANDBOX = 2 * 60; // 2 minutes, seconds
@@ -17,6 +17,11 @@ var SubscriptionSource;
     SubscriptionSource["stripe"] = "stripe";
     SubscriptionSource["apple"] = "apple";
 })(SubscriptionSource = exports.SubscriptionSource || (exports.SubscriptionSource = {}));
+var PlanRenewalFrequency;
+(function (PlanRenewalFrequency) {
+    PlanRenewalFrequency["Monthly"] = "monthly";
+    PlanRenewalFrequency["Annually"] = "annually";
+})(PlanRenewalFrequency = exports.PlanRenewalFrequency || (exports.PlanRenewalFrequency = {}));
 var SubscriptionStatus;
 (function (SubscriptionStatus) {
     SubscriptionStatus["trial"] = "trial";

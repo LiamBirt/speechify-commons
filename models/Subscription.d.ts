@@ -8,6 +8,10 @@ export declare enum SubscriptionSource {
     stripe = "stripe",
     apple = "apple"
 }
+export declare enum PlanRenewalFrequency {
+    Monthly = "monthly",
+    Annually = "annually"
+}
 export declare enum SubscriptionStatus {
     trial = "trial",
     paying = "paying",
