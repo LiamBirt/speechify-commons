@@ -269,6 +269,8 @@ export class SubscriptionInfo implements ISubscriptionInfo {
     this.nextApplicationAt = info.nextApplicationAt;
     this.environment = info.environment;
     this.source = info.source || SubscriptionSource.apple;
+    this.stripeCustomerId = info.stripeCustomerId;
+    this.stripeSubscriptionId = info.stripeSubscriptionId;
   }
 
   private isProd(): boolean {

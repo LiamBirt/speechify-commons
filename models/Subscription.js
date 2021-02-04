@@ -89,6 +89,8 @@ class SubscriptionInfo {
         this.nextApplicationAt = info.nextApplicationAt;
         this.environment = info.environment;
         this.source = info.source || SubscriptionSource.apple;
+        this.stripeCustomerId = info.stripeCustomerId;
+        this.stripeSubscriptionId = info.stripeSubscriptionId;
     }
     static create(userId, id, is_trial_period, source) {
         const subscriptionInfo = new SubscriptionInfo({
