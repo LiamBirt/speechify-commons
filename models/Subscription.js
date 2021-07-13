@@ -16,6 +16,7 @@ var SubscriptionSource;
 (function (SubscriptionSource) {
     SubscriptionSource["stripe"] = "stripe";
     SubscriptionSource["apple"] = "apple";
+    SubscriptionSource["paypal"] = "paypal";
 })(SubscriptionSource = exports.SubscriptionSource || (exports.SubscriptionSource = {}));
 var PlanRenewalFrequency;
 (function (PlanRenewalFrequency) {
@@ -91,6 +92,7 @@ class SubscriptionInfo {
         this.source = info.source || SubscriptionSource.apple;
         this.stripeCustomerId = info.stripeCustomerId;
         this.stripeSubscriptionId = info.stripeSubscriptionId;
+        this.paypalSubscriptionId = info.paypalSubscriptionId;
     }
     static create(userId, id, is_trial_period, source) {
         const subscriptionInfo = new SubscriptionInfo({
@@ -181,6 +183,7 @@ class SubscriptionInfo {
             source: this.source,
             stripeSubscriptionId: this.stripeSubscriptionId || '',
             stripeCustomerId: this.stripeCustomerId || '',
+            paypalSubscriptionId: this.paypalSubscriptionId || '',
         };
     }
     applySubscriptionLimit() {
@@ -274,6 +277,30 @@ class SubscriptionInfo {
         return this.nextApplicationAt > 0
             ? this.nextApplicationAt
             : this.getGraceMax();
+    }
+    applyPaypal(periodEnd, isProduction, paypalSubscriptionId, subscriptionPlan) {
+        // stop processing the request if backend cannot handle this subscription type
+        if (!subscriptionPlan) {
+            // tslint:disable-next-line:no-console
+            const errorMessage = `Cannot handle subscription type: ${this.productId}`;
+            throw new Error(errorMessage);
+        }
+        this.environment = isProduction
+            ? PaymentEnvironment.Production
+            : PaymentEnvironment.Sandbox;
+        this.productId = subscriptionPlan.name;
+        this.latestTransactionId = '';
+        this.source = SubscriptionSource.paypal;
+        this.is_trial_period = 'false';
+        this.expiresAt = periodEnd;
+        this.is_refunded = false;
+        this.limitsCountLeft = subscriptionPlan.renewLimit;
+        this.nextCheckAt = -1;
+        this.nextApplicationAt = moment_1.default().unix();
+        this.paypalSubscriptionId = paypalSubscriptionId;
+        this.subscriptionPlan = subscriptionPlan;
+        this.onUpdate();
+        return true;
     }
     applyStripe(periodEnd, isProduction, stripeCustomerId, stripeSubscriptionId, subscriptionPlan) {
         // stop processing the request if backend cannot handle this subscription type
