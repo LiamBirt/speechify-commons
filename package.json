@@ -1,6 +1,6 @@
 {
   "name": "@speechify/commons",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Models, Services and Helpers for common use",
   "repository": "https://github.com/SpeechifyInc/speechify-commons.git",
   "author": "Speechify",

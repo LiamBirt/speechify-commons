@@ -5,3 +5,4 @@ package-lock.json
 .fusebox
 coverage
 .DS_Store
+.history/

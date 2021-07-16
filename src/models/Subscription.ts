@@ -11,6 +11,7 @@ export enum PaymentEnvironment {
 export enum SubscriptionSource {
   stripe = 'stripe',
   apple = 'apple',
+  paypal = 'paypal'
 }
 
 export enum PlanRenewalFrequency {
@@ -98,6 +99,9 @@ export interface ISubscriptionInfo {
   // stripe subscription specific
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
+
+  // paypal subscription specific
+  paypalSubscriptionId?: string;
 }
 
 export interface IInAppPurchaseReceipt {
@@ -253,6 +257,8 @@ export class SubscriptionInfo implements ISubscriptionInfo {
   // Stripe specific
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
+  // Paypal specific
+  paypalSubscriptionId?: string;
 
   constructor(info: ISubscriptionInfo, id: string) {
     this.id = id;
@@ -271,6 +277,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
     this.source = info.source || SubscriptionSource.apple;
     this.stripeCustomerId = info.stripeCustomerId;
     this.stripeSubscriptionId = info.stripeSubscriptionId;
+    this.paypalSubscriptionId = info.paypalSubscriptionId;
   }
 
   private isProd(): boolean {
@@ -355,6 +362,7 @@ export class SubscriptionInfo implements ISubscriptionInfo {
       source: this.source,
       stripeSubscriptionId: this.stripeSubscriptionId || '',
       stripeCustomerId: this.stripeCustomerId || '',
+      paypalSubscriptionId: this.paypalSubscriptionId || '',
     };
   }
 
@@ -491,6 +499,37 @@ export class SubscriptionInfo implements ISubscriptionInfo {
     return this.nextApplicationAt > 0
       ? this.nextApplicationAt
       : this.getGraceMax();
+  }
+
+  applyPaypal(
+    periodEnd: number,
+    isProduction: boolean,
+    paypalSubscriptionId: string,
+    subscriptionPlan?: ISubscriptionPlan
+  ): boolean {
+    // stop processing the request if backend cannot handle this subscription type
+    if (!subscriptionPlan) {
+      // tslint:disable-next-line:no-console
+      const errorMessage = `Cannot handle subscription type: ${this.productId}`;
+      throw new Error(errorMessage);
+    }
+
+    this.environment = isProduction
+      ? PaymentEnvironment.Production
+      : PaymentEnvironment.Sandbox;
+    this.productId = subscriptionPlan.name;
+    this.latestTransactionId = '';
+    this.source = SubscriptionSource.paypal;
+    this.is_trial_period = 'false';
+    this.expiresAt = periodEnd;
+    this.is_refunded = false;
+    this.limitsCountLeft = subscriptionPlan.renewLimit;
+    this.nextCheckAt = -1;
+    this.nextApplicationAt = moment().unix();
+    this.paypalSubscriptionId = paypalSubscriptionId;
+    this.subscriptionPlan = subscriptionPlan;
+    this.onUpdate();
+    return true;
   }
 
   applyStripe(

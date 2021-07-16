@@ -6,7 +6,8 @@ export declare enum PaymentEnvironment {
 }
 export declare enum SubscriptionSource {
     stripe = "stripe",
-    apple = "apple"
+    apple = "apple",
+    paypal = "paypal"
 }
 export declare enum PlanRenewalFrequency {
     Monthly = "monthly",
@@ -60,6 +61,7 @@ export interface ISubscriptionInfo {
     latestTransactionId?: string;
     stripeCustomerId?: string;
     stripeSubscriptionId?: string;
+    paypalSubscriptionId?: string;
 }
 export interface IInAppPurchaseReceipt {
     quantity: string;
@@ -121,6 +123,7 @@ export declare class SubscriptionInfo implements ISubscriptionInfo {
     latestTransactionId?: string;
     stripeCustomerId?: string;
     stripeSubscriptionId?: string;
+    paypalSubscriptionId?: string;
     constructor(info: ISubscriptionInfo, id: string);
     private isProd;
     private onUpdate;
@@ -137,6 +140,7 @@ export declare class SubscriptionInfo implements ISubscriptionInfo {
     applySubscriptionLimit(): boolean;
     applyTransaction(transaction: IInAppPurchaseReceipt, isProduction: boolean, subscriptionPlan?: ISubscriptionPlan): boolean;
     calculateCurrentBatchExpiresAt(): number;
+    applyPaypal(periodEnd: number, isProduction: boolean, paypalSubscriptionId: string, subscriptionPlan?: ISubscriptionPlan): boolean;
     applyStripe(periodEnd: number, isProduction: boolean, stripeCustomerId: string, stripeSubscriptionId: string, subscriptionPlan?: ISubscriptionPlan): boolean;
     createUserSubscription(source?: SubscriptionSource): Subscription;
     scheduleNextCheck(): number;
