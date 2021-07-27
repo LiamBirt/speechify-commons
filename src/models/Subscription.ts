@@ -11,7 +11,8 @@ export enum PaymentEnvironment {
 export enum SubscriptionSource {
   stripe = 'stripe',
   apple = 'apple',
-  paypal = 'paypal'
+  paypal = 'paypal',
+  google = 'google'
 }
 
 export enum PlanRenewalFrequency {
@@ -20,26 +21,34 @@ export enum PlanRenewalFrequency {
 }
 
 export enum SubscriptionStatus {
-  trial = 'trial',
   paying = 'paying',
   cancelled = 'cancelled',
-  transferred = 'transferred',
+  expired = 'expired',
 }
-
+export enum SubscriptionType {
+  trial = 'trial',
+  premium = 'premium',
+}
 export interface ISubscription {
   resource: {
     wordsLeft?: number; // amount of words left to use
-    decrementedAt: number; // date when symbolsLeft was decremented the last time
+    decrementedAt: number; // date (unix timestamp) when wordsLeft was decremented the last time
+
+    // Date (unix timestamp) when wordsLeft was refilled the last time. Only exists for premium users.
+    // If the user hasn't had a refill yet, this is the date their most recent subscription started.
+    lastRefillAt?: number;
   };
-  expiresAt: number;
-  currentBatchExpiresAt: number;
-  updatedAt: number;
-  productId: string;
-  source: SubscriptionSource;
-  environment?: PaymentEnvironment;
-  promoCodeId?: string;
-  status: SubscriptionStatus;
-  discountOfferId?: string;
+  subscriptions: {
+    expiresAt: number; // unix timestamp
+    createdAt: number; // unix timestamp
+    productId: string;
+    source: SubscriptionSource;
+    environment?: PaymentEnvironment;
+    promoCodeId?: string;
+    status: SubscriptionStatus;
+    type: SubscriptionType;
+    discountOfferId?: string;
+  }[];
 }
 export interface ISubscriptionPlan {
   name: string;
@@ -126,9 +135,9 @@ export interface IInAppPurchaseReceipt {
 
 export class Subscription implements ISubscription {
   resource: {
-    wordsLeft?: number; // amount of words left to use
-    // amount of words left to use
-    decrementedAt: number; // date when symbolsLeft was decremented the last time
+    wordsLeft?: number;
+    decrementedAt: number;
+    lastRefillAt?: number;
   };
   expiresAt: number;
   currentBatchExpiresAt: number;
@@ -167,7 +176,7 @@ export class Subscription implements ISubscription {
     this.expiresAt = 0;
     this.currentBatchExpiresAt = 0;
     this.environment = environment;
-    source = source || SubscriptionSource.apple;
+    this.source = source;
     this.updatedAt = moment().unix();
     this.status = SubscriptionStatus.cancelled;
   }
